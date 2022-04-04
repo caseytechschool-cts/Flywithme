@@ -4,6 +4,7 @@ import os.path as path
 from djitellopy import Tello
 import cv2
 
+BAR_MAX = 100
 
 def image_to_base64(name):
     with open(path.join("images", name), "rb") as data:
@@ -23,7 +24,7 @@ def main():
     recording = False
 
     layout = [[sg.Text("Connected", size=(50, 1), justification="left", key="-conStatus-"),
-               sg.Text(f"Battery: {tello.get_battery()}%", size=(100, 1), justification="right", key="-batStatus-")],
+               sg.ProgressBar(BAR_MAX, size=(100, 1), justification="right", orientation='h', key="-batStatus-")],
               [sg.Image(source=image_to_base64("drone.png"), size=(600, 400), key="-image-"),
                sg.Button(image_data=image_to_base64("camera_on.png"), key="-camera-")]]
 
@@ -37,6 +38,14 @@ def main():
         event, values = window.read(timeout=20)
         if event == "Exit" or event == sg.WIN_CLOSED:
             return
+
+        # update the battery progress bar
+        battery = tello.get_battery()
+        window['-batStatus-'].update(battery)
+        if battery <= 20:
+            window['-batStatus-'].update(bar_color="red")
+        else:
+            window['-batStatus-'].update(bar_color="green")
 
         if event == "-camera-":
             window["-camera-"].update(disabled=True)
