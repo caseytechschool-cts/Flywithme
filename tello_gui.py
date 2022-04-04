@@ -24,7 +24,7 @@ def main():
 
     layout = [[sg.Text("Connected", size=(50, 1), justification="left", key="-conStatus-"),
                sg.Text(f"Battery: {tello.get_battery()}%", size=(100, 1), justification="right", key="-batStatus-")],
-              [sg.Image(source=image_to_base64("drone.png"), size=(800, 600), key="-image-"),
+              [sg.Image(source=image_to_base64("drone.png"), size=(600, 400), key="-image-"),
                sg.Button(image_data=image_to_base64("camera_on.png"), key="-camera-")]]
 
     window = sg.Window(title="  ::Tello Controller by CTS::  ",
