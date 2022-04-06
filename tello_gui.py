@@ -21,19 +21,40 @@ def main():
 
     frame_read = tello.get_frame_read()
     recording = False
+    takeoff = False
 
-    col = [sg.Text(text="Connected", size=(50, 5), justification="left", key="-conStatus-"),
-               sg.Push(), sg.ProgressBar(BAR_MAX, orientation='h', key="-batStatus-", style='alt', border_width=5, size_px=(100,10))]
+    status_bar = [sg.Text(text="Connected", size=(50, 1), justification="left", key="-conStatus-"),
+           sg.Push(), sg.ProgressBar(BAR_MAX, orientation='h', key="-batStatus-", style='alt', size=(10, 5), border_width=3)]
 
-    layout = [sg.Column(col, vertical_alignment='center'),
-              [sg.Image(source=image_to_base64("drone.png"), size=(600, 400), key="-image-"),
-               sg.Button(image_data=image_to_base64("camera_on.png"), key="-camera-")]]
+    video_feed = [sg.Push(), sg.Image(source=image_to_base64("drone.png"), key="-image-", size=(600, 400)),
+               sg.Push(), sg.Button(image_data=image_to_base64("camera_on.png"), key="-camera-", tooltip="Camera on")]
+
+    movement_lrtd = [[sg.Push(), sg.Button(image_data=image_to_base64("up.png"), key="-up-", tooltip="Move up"), sg.Push()],
+                     [sg.Button(image_data=image_to_base64("left.png"), key="-left-", tooltip="Move left"), sg.Push(),
+                     sg.Button(image_data=image_to_base64("right.png"), key="-right-", tooltip="Move right")],
+                     [sg.Push(), sg.Button(image_data=image_to_base64("down.png"), key="-down-", tooltip="Move down"), sg.Push()]]
+
+    movement_flip = [[sg.Button(image_data=image_to_base64("flip.png"), key="-flip-", tooltip="Random flip"),
+                     sg.Button(image_data=image_to_base64("front_flip.png"), key="-front_flip-", tooltip="Front flip"),
+                     sg.Button(image_data=image_to_base64("back_flip.png"), key="-back_flip-", tooltip="Back flip")]]
+
+    turn = [[sg.Button(image_data=image_to_base64("turn_sharp_left.png"), key="-sharp_left-", tooltip="Sharp left"),
+            sg.Button(image_data=image_to_base64("turn_sharp_right.png"), key="-sharp_right-", tooltip="Sharp right"),
+            sg.Button(image_data=image_to_base64("turn_slight_left.png"), key="-slight_left-", tooltip="Slight left"),
+            sg.Button(image_data=image_to_base64("turn_slight_right.png"), key="-slight_right-", tooltip="Slight right")]]
+
+    on_off = [[sg.Button(image_data=image_to_base64("takeoff.png"), key="-takeoff-", tooltip="Takeoff")]]
+
+    layout = [status_bar, video_feed, [sg.Column(movement_lrtd), sg.VerticalSeparator(), sg.Column(movement_flip),
+                                       sg.VerticalSeparator(), sg.Column(turn),
+                                       sg.VerticalSeparator(), sg.Column(on_off)]
+              ]
 
     window = sg.Window(title="  ::Tello Controller by CTS::  ",
                        layout=layout,
                        size=(1200, 800),
                        icon=image_to_base64("drone_ico.png"),
-                       element_justification="center")
+                       progress_bar_color=("green", "white"))
 
     while True:
         event, values = window.read(timeout=20)
@@ -45,20 +66,18 @@ def main():
         # print(battery)
         window['-batStatus-'].update(battery)
         if battery <= 20:
-            window['-batStatus-'].update(bar_color="red")
+            window['-batStatus-'].update(bar_color=("red", "white"))
             window['-conStatus-'].update(value="Swap the battery")
         else:
-            window['-batStatus-'].update(bar_color="green")
+            window['-batStatus-'].update(bar_color=("green", "white"))
 
         if event == "-camera-":
             window["-camera-"].update(disabled=True)
             recording = True
 
         if recording:
-            # ret, frame = cap.read()
-            imgbytes = cv2.imencode('.png', frame_read.frame)[1].tobytes()  # ditto
-            # print(frame_read.frame)
-            window['-image-'].update(data=imgbytes)
+            # imgbytes = cv2.imencode('.png', frame_read.frame)[1].tobytes()  # ditto
+            window['-image-'].update(data=cv2.imencode('.png', frame_read.frame)[1].tobytes())
 
 
 if __name__ == '__main__':
