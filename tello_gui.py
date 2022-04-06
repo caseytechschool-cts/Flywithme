@@ -6,6 +6,7 @@ import cv2
 
 BAR_MAX = 100
 
+
 def image_to_base64(name):
     with open(path.join("images", name), "rb") as data:
         image_data = data.read()
@@ -19,12 +20,12 @@ def main():
     tello.streamon()
 
     frame_read = tello.get_frame_read()
-
-    cap = cv2.VideoCapture(0)
     recording = False
 
-    layout = [[sg.Text("Connected", size=(50, 1), justification="left", key="-conStatus-"),
-               sg.ProgressBar(BAR_MAX, size=(100, 1), justification="right", orientation='h', key="-batStatus-")],
+    col = [sg.Text(text="Connected", size=(50, 5), justification="left", key="-conStatus-"),
+               sg.Push(), sg.ProgressBar(BAR_MAX, orientation='h', key="-batStatus-", style='alt', border_width=5, size_px=(100,10))]
+
+    layout = [sg.Column(col, vertical_alignment='center'),
               [sg.Image(source=image_to_base64("drone.png"), size=(600, 400), key="-image-"),
                sg.Button(image_data=image_to_base64("camera_on.png"), key="-camera-")]]
 
@@ -41,9 +42,11 @@ def main():
 
         # update the battery progress bar
         battery = tello.get_battery()
+        # print(battery)
         window['-batStatus-'].update(battery)
         if battery <= 20:
             window['-batStatus-'].update(bar_color="red")
+            window['-conStatus-'].update(value="Swap the battery")
         else:
             window['-batStatus-'].update(bar_color="green")
 
