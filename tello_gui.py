@@ -26,7 +26,7 @@ def main():
     status_bar = [sg.Text(text="Connected", size=(50, 1), justification="left", key="-conStatus-"),
            sg.Push(), sg.ProgressBar(BAR_MAX, orientation='h', key="-batStatus-", style='alt', size=(10, 5), border_width=3)]
 
-    video_feed = [sg.Push(), sg.Image(source=image_to_base64("drone.png"), key="-image-", size=(600, 400)),
+    video_feed = [sg.Push(), sg.Image(source=image_to_base64("drone.png"), key="-image-"),
                sg.Push(), sg.Button(image_data=image_to_base64("camera_on.png"), key="-camera-", tooltip="Camera on")]
 
     movement_lrtd = [[sg.Push(), sg.Button(image_data=image_to_base64("up.png"), key="-up-", tooltip="Move up"), sg.Push()],
@@ -77,7 +77,8 @@ def main():
 
         if recording:
             # imgbytes = cv2.imencode('.png', frame_read.frame)[1].tobytes()  # ditto
-            window['-image-'].update(data=cv2.imencode('.png', frame_read.frame)[1].tobytes())
+            # window['-image-'].update(subsample=2)
+            window['-image-'].update(data=cv2.imencode('.png', frame_read.frame)[1].tobytes(), subsample=2)
 
 
 if __name__ == '__main__':
