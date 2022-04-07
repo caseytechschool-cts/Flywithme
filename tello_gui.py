@@ -27,7 +27,7 @@ def main():
     status_bar = [sg.Text(text="Connected", size=(50, 1), justification="left", key="-conStatus-"),
            sg.Push(), sg.ProgressBar(BAR_MAX, orientation='h', key="-batStatus-", style='alt', size=(10, 5), border_width=3)]
 
-    video_feed = [sg.Push(), sg.Image(source=image_to_base64("drone.png"), key="-image-"),
+    video_feed = [sg.Push(), sg.Image(source=image_to_base64("drone.png"), key="-image-", subsample=2),
                sg.Push(), sg.Button(image_data=image_to_base64("camera_on.png"), key="-camera-", tooltip="Camera on")]
 
     movement_lrfb = [[sg.Push(), sg.Button(image_data=image_to_base64("up.png"), key="-forward-", tooltip="Move forward"), sg.Push()],
@@ -60,13 +60,15 @@ def main():
     while True:
         event, values = window.read(timeout=20)
         if event == "Exit" or event == sg.WIN_CLOSED:
-            tello.land()
-            tello.end()
+            if takeoff:
+                tello.land()
+                if recording:
+                    tello.streamoff()
+                tello.end()
             return
 
         # update the battery progress bar
         battery = tello.get_battery()
-        # print(battery)
         window['-batStatus-'].update(battery)
         if battery <= 20:
             window['-batStatus-'].update(bar_color=("red", "white"))
