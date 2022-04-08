@@ -8,6 +8,10 @@ import threading
 
 BAR_MAX = 100
 TOTAL_ALLOWED_FLIPS = 2
+SHARP_ROTATE = 90
+SLIGHT_ROTATE = 30
+STEP_SIZE = 20
+LOW_BATTERY_LEVEL = 20
 flips = ["left", "right", "forward", "back"]
 
 """A simple function for converting the source image into a base64 data for universal use.
@@ -87,7 +91,7 @@ def main():
         # update the battery progress bar
         battery = tello.get_battery()
         window['-batStatus-'].update(battery)
-        if battery <= 20:
+        if battery <= LOW_BATTERY_LEVEL:
             window['-batStatus-'].update(bar_color=("red", "white"))
             window['-conStatus-'].update(value="Swap the battery")
         else:
@@ -129,16 +133,16 @@ def main():
             tello.emergency()
 
         if event == "-forward-" and takeoff:
-            tello.move_forward(20)
+            tello.move_forward(STEP_SIZE)
 
         if event == "-backward-" and takeoff:
-            tello.move_back(20)
+            tello.move_back(STEP_SIZE)
 
         if event == "-left-" and takeoff:
-            tello.move_left(20)
+            tello.move_left(STEP_SIZE)
 
         if event == "-right-" and takeoff:
-            tello.move_right(20)
+            tello.move_right(STEP_SIZE)
 
         if event == "-flip-" and takeoff and num_of_flips < TOTAL_ALLOWED_FLIPS:
             num_of_flips += 1
@@ -154,16 +158,16 @@ def main():
             tello.back_flip()
 
         if event == "-sharp_left-" and takeoff:
-            tello.rotate_counter_clockwise(90)
+            tello.rotate_counter_clockwise(SHARP_ROTATE)
 
         if event == "-sharp_right-" and takeoff:
-            tello.rotate_clockwise(90)
+            tello.rotate_clockwise(SHARP_ROTATE)
 
         if event == "-slight_right-" and takeoff:
-            tello.rotate_clockwise(30)
+            tello.rotate_clockwise(SLIGHT_ROTATE)
 
         if event == "-slight_left-" and takeoff:
-            tello.rotate_counter_clockwise(30)
+            tello.rotate_counter_clockwise(SLIGHT_ROTATE)
 
 
 if __name__ == '__main__':
