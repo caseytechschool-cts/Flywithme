@@ -37,6 +37,7 @@ def video_feed(frame_read, window):
 
 
 def main():
+    sg.theme("SystemDefault")
     # Make the drone connection
     tello = Tello()
     tello.connect()
@@ -47,8 +48,9 @@ def main():
     status_bar = [sg.Text(text="Connected", size=(50, 1), justification="left", key="-conStatus-"),
            sg.Push(), sg.ProgressBar(BAR_MAX, orientation='h', key="-batStatus-", style='alt', size=(10, 5), border_width=3)]
 
-    video = [sg.Push(), sg.Image(source=image_to_base64("drone.png"), key="-image-", subsample=2),
-             sg.Push(), sg.Button(image_data=image_to_base64("camera_on.png"), key="-camera-", tooltip="Camera on")]
+    video = [[sg.Push(), sg.Image(source=image_to_base64("drone.png"), key="-image-", subsample=2),
+             sg.Push(), sg.Button(image_data=image_to_base64("camera_on.png"), key="-camera-", tooltip="Camera on", pad=65)],
+             [sg.Text("---"*150)]]
 
     movement_lrfb = [[sg.Push(), sg.Button(image_data=image_to_base64("up.png"), key="-forward-", tooltip="Move forward"), sg.Push()],
                      [sg.Button(image_data=image_to_base64("left.png"), key="-left-", tooltip="Move left"), sg.Push(),
@@ -74,7 +76,7 @@ def main():
 
     window = sg.Window(title="  ::Tello Controller by CTS::  ",
                        layout=layout,
-                       size=(1200, 800),
+                       size=(1200, 680),
                        icon=image_to_base64("drone_ico.png"),
                        progress_bar_color=("green", "white"))
 
