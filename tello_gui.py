@@ -17,6 +17,10 @@ def image_to_base64(name):
         return base64.b64encode(image_data)
 
 
+def video_feed(frame_read, window):
+    window.write_event_value("-video-data-", cv2.imencode('.png', frame_read.frame)[1].tobytes())
+
+
 def main():
     # Make the drone connection
     tello = Tello()
@@ -28,8 +32,8 @@ def main():
     status_bar = [sg.Text(text="Connected", size=(50, 1), justification="left", key="-conStatus-"),
            sg.Push(), sg.ProgressBar(BAR_MAX, orientation='h', key="-batStatus-", style='alt', size=(10, 5), border_width=3)]
 
-    video_feed = [sg.Push(), sg.Image(source=image_to_base64("drone.png"), key="-image-", subsample=2),
-               sg.Push(), sg.Button(image_data=image_to_base64("camera_on.png"), key="-camera-", tooltip="Camera on")]
+    video = [sg.Push(), sg.Image(source=image_to_base64("drone.png"), key="-image-", subsample=2),
+             sg.Push(), sg.Button(image_data=image_to_base64("camera_on.png"), key="-camera-", tooltip="Camera on")]
 
     movement_lrfb = [[sg.Push(), sg.Button(image_data=image_to_base64("up.png"), key="-forward-", tooltip="Move forward"), sg.Push()],
                      [sg.Button(image_data=image_to_base64("left.png"), key="-left-", tooltip="Move left"), sg.Push(),
@@ -45,11 +49,12 @@ def main():
             sg.Button(image_data=image_to_base64("turn_slight_left.png"), key="-slight_left-", tooltip="Slight left"),
             sg.Button(image_data=image_to_base64("turn_slight_right.png"), key="-slight_right-", tooltip="Slight right")]]
 
-    on_off = [[sg.Button(image_data=image_to_base64("takeoff.png"), key="-takeoff-", tooltip="Takeoff")]]
+    on_off = [[sg.Button(image_data=image_to_base64("takeoff.png"), key="-takeoff-", tooltip="Takeoff")],
+              [sg.Button(image_data=image_to_base64("danger.png"), key="-danger-", tooltip="Emergency stop")]]
 
-    layout = [status_bar, video_feed, [sg.Column(movement_lrfb), sg.VerticalSeparator(), sg.Column(movement_flip),
-                                       sg.VerticalSeparator(), sg.Column(turn),
-                                       sg.VerticalSeparator(), sg.Column(on_off)]
+    layout = [status_bar, video, [sg.Column(movement_lrfb), sg.VerticalSeparator(), sg.Column(movement_flip),
+                                  sg.VerticalSeparator(), sg.Column(turn),
+                                  sg.VerticalSeparator(), sg.Column(on_off)]
               ]
 
     window = sg.Window(title="  ::Tello Controller by CTS::  ",
@@ -86,12 +91,16 @@ def main():
             else:
                 recording = False
                 window["-camera-"].update(image_data=image_to_base64("camera_on.png"))
-                tello.streamoff()
+                # tello.streamoff()
 
         if recording:
-            window['-image-'].update(data=cv2.imencode('.png', frame_read.frame)[1].tobytes(), subsample=2)
+            threading.Thread(target=video, args=(frame_read, window), daemon=True).start()
+            # window['-image-'].update(data=cv2.imencode('.png', frame_read.frame)[1].tobytes(), subsample=2)
         else:
-            window["-image-"].update(data=image_to_base64("drone.png"))
+            window["-image-"].update(data=image_to_base64("drone.png"), subsample=2)
+
+        if event == "-video-data-" and recording:
+            window['-image-'].update(data=values["-video-data-"], subsample=2)
 
         if not takeoff and event == "-takeoff-":
             takeoff = True
@@ -102,6 +111,9 @@ def main():
             takeoff = False
             window["-takeoff-"].update(image_data=image_to_base64("takeoff.png"))
             tello.land()
+
+        if event == "-danger-" and takeoff:
+            tello.emergency()
 
         if event == "-forward-" and takeoff:
             tello.move_forward(20)
