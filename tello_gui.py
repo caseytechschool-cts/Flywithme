@@ -4,6 +4,7 @@ import os.path as path
 from djitellopy import Tello
 import cv2
 import random
+import threading
 
 BAR_MAX = 100
 TOTAL_ALLOWED_FLIPS = 2
