@@ -10,11 +10,22 @@ BAR_MAX = 100
 TOTAL_ALLOWED_FLIPS = 2
 flips = ["left", "right", "forward", "back"]
 
+"""A simple function for converting the source image into a base64 data for universal use.
+:param name: (str) the name of the image file
+:return: the base64 of the image file
+"""
+
 
 def image_to_base64(name):
     with open(path.join("images", name), "rb") as data:
         image_data = data.read()
         return base64.b64encode(image_data)
+
+
+"""A simple function for receiving the video feed from the drone. Creates it's own thread for the non-blocking GUI.
+:param name: frame_read: the frame_read object from the tello drone
+ window: the window object from the PySimpleGUI
+ :return: it puts the video data as the event outcome"""
 
 
 def video_feed(frame_read, window):
@@ -94,7 +105,7 @@ def main():
                 # tello.streamoff()
 
         if recording:
-            threading.Thread(target=video, args=(frame_read, window), daemon=True).start()
+            threading.Thread(target=video_feed, args=(frame_read, window), daemon=True).start()
             # window['-image-'].update(data=cv2.imencode('.png', frame_read.frame)[1].tobytes(), subsample=2)
         else:
             window["-image-"].update(data=image_to_base64("drone.png"), subsample=2)
@@ -113,6 +124,8 @@ def main():
             tello.land()
 
         if event == "-danger-" and takeoff:
+            takeoff = False
+            window["-takeoff-"].update(image_data=image_to_base64("takeoff.png"))
             tello.emergency()
 
         if event == "-forward-" and takeoff:
