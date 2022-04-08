@@ -6,13 +6,17 @@ import cv2
 import random
 import threading
 
+"""Things need to be included in
+exception handling for tello commands.
+Multithreading for the tello commands"""
+
 BAR_MAX = 100
 TOTAL_ALLOWED_FLIPS = 2
 SHARP_ROTATE = 90
 SLIGHT_ROTATE = 30
 STEP_SIZE = 20
 LOW_BATTERY_LEVEL = 20
-flips = ["left", "right", "forward", "back"]
+flips = ["l", "r", "f", "b"]
 
 """A simple function for converting the source image into a base64 data for universal use.
 :param name: (str) the name of the image file
@@ -153,11 +157,11 @@ def main():
 
         if event == "-front_flip-" and takeoff and num_of_flips < TOTAL_ALLOWED_FLIPS:
             num_of_flips += 1
-            tello.front_flip()
+            tello.flip_forward()
 
         if event == "-back_flip-" and takeoff and num_of_flips < TOTAL_ALLOWED_FLIPS:
             num_of_flips += 1
-            tello.back_flip()
+            tello.flip_back()
 
         if event == "-sharp_left-" and takeoff:
             tello.rotate_counter_clockwise(SHARP_ROTATE)
