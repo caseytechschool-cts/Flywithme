@@ -5,6 +5,7 @@ from djitellopy import Tello
 import cv2
 import random
 import threading
+from concurrent.futures import ThreadPoolExecutor
 
 """Things need to be included in
 exception handling for tello commands.
@@ -42,12 +43,18 @@ def video_feed(frame_read, window):
 
 def main():
     sg.theme("SystemDefault")
-    # Make the drone connection
-    tello = Tello()
-    tello.connect()
     num_of_flips = 0
     recording = False
     takeoff = False
+    run_tello = False
+
+    try:
+        tello = Tello()
+        tello.connect()
+    except Exception as e:
+        print(e)
+    else:
+        run_tello = True
 
     status_bar = [sg.Text(text="Connected", size=(50, 1), justification="left", key="-conStatus-"),
            sg.Push(), sg.ProgressBar(BAR_MAX, orientation='h', key="-batStatus-", style='alt', size=(10, 5), border_width=3)]
@@ -73,14 +80,16 @@ def main():
     on_off = [[sg.Button(image_data=image_to_base64("takeoff.png"), key="-takeoff-", tooltip="Takeoff")],
               [sg.Button(image_data=image_to_base64("danger.png"), key="-danger-", tooltip="Emergency stop")]]
 
+    problem_bar = [[sg.Push(), sg.Text(text="", text_color="red", key="-problem-bar-"), sg.Push()]]
+
     layout = [status_bar, video, [sg.Column(movement_lrfb), sg.VerticalSeparator(), sg.Column(movement_flip),
                                   sg.VerticalSeparator(), sg.Column(turn),
-                                  sg.VerticalSeparator(), sg.Column(on_off)]
+                                  sg.VerticalSeparator(), sg.Column(on_off)], problem_bar
               ]
 
     window = sg.Window(title="  ::Tello Controller by CTS::  ",
                        layout=layout,
-                       size=(1200, 680),
+                       size=(1200, 700),
                        icon=image_to_base64("drone_ico.png"),
                        progress_bar_color=("green", "white"))
 
@@ -88,92 +97,160 @@ def main():
         event, values = window.read(timeout=20)
         if event == "Exit" or event == sg.WIN_CLOSED:
             if takeoff:
-                tello.land()
-                if recording:
-                    tello.streamoff()
-                tello.end()
+                try:
+                    tello.land()
+                    if recording:
+                        try:
+                            tello.streamoff()
+                        except Exception as e:
+                            print(e)
+                    tello.end()
+                except Exception as e:
+                    print(e)
             return
 
-        # update the battery progress bar
-        battery = tello.get_battery()
-        window['-batStatus-'].update(battery)
-        if battery <= LOW_BATTERY_LEVEL:
-            window['-batStatus-'].update(bar_color=("red", "white"))
-            window['-conStatus-'].update(value="Swap the battery")
-        else:
-            window['-batStatus-'].update(bar_color=("green", "white"))
-
-        if event == "-camera-":
-            if not recording:
-                window["-camera-"].update(image_data=image_to_base64("camera_off.png"))
-                tello.streamon()
-                frame_read = tello.get_frame_read()
-                recording = True
+        if run_tello:
+            # update the battery progress bar
+            try:
+                battery = tello.get_battery()
+            except Exception as e:
+                print(e)
             else:
-                recording = False
-                window["-camera-"].update(image_data=image_to_base64("camera_on.png"))
-                # tello.streamoff()
+                window['-batStatus-'].update(battery)
 
-        if recording:
-            threading.Thread(target=video_feed, args=(frame_read, window), daemon=True).start()
-            # window['-image-'].update(data=cv2.imencode('.png', frame_read.frame)[1].tobytes(), subsample=2)
+                if battery <= LOW_BATTERY_LEVEL:
+                    window['-batStatus-'].update(bar_color=("red", "white"))
+                    window['-conStatus-'].update(value="Swap the battery")
+                else:
+                    window['-batStatus-'].update(bar_color=("green", "white"))
+
+            if event == "-camera-":
+                if not recording:
+                    window["-camera-"].update(image_data=image_to_base64("camera_off.png"))
+                    try:
+                        tello.streamon()
+                    except Exception as e:
+                        print(e)
+                    else:
+                        frame_read = tello.get_frame_read()
+                        recording = True
+                else:
+                    recording = False
+                    window["-camera-"].update(image_data=image_to_base64("camera_on.png"))
+
+            if recording:
+                threading.Thread(target=video_feed, args=(frame_read, window), daemon=True).start()
+            else:
+                window["-image-"].update(data=image_to_base64("drone.png"), subsample=2)
+
+            if event == "-video-data-" and recording:
+                window['-image-'].update(data=values["-video-data-"], subsample=2)
+
+            if not takeoff and event == "-takeoff-":
+                try:
+                    tello.takeoff()
+                except Exception as e:
+                    print(e)
+                else:
+                    takeoff = True
+                    window["-takeoff-"].update(image_data=image_to_base64("land.png"))
+
+            elif takeoff and event == "-takeoff-":
+                try:
+                    tello.land()
+                except Exception as e:
+                    print(e)
+                else:
+                    takeoff = False
+                    window["-takeoff-"].update(image_data=image_to_base64("takeoff.png"))
+
+            if event == "-danger-" and takeoff:
+                try:
+                    tello.emergency()
+                except Exception as e:
+                    print(e)
+                else:
+                    takeoff = False
+                    window["-takeoff-"].update(image_data=image_to_base64("takeoff.png"))
+
+            if event == "-forward-" and takeoff:
+                try:
+                    tello.move_forward(STEP_SIZE)
+                except Exception as e:
+                    print(e)
+
+            if event == "-backward-" and takeoff:
+                try:
+                    tello.move_back(STEP_SIZE)
+                except Exception as e:
+                    print(e)
+
+            if event == "-left-" and takeoff:
+                try:
+                    tello.move_left(STEP_SIZE)
+                except Exception as e:
+                    print(e)
+
+            if event == "-right-" and takeoff:
+                try:
+                    tello.move_right(STEP_SIZE)
+                except Exception as e:
+                    print(e)
+
+            if event == "-flip-" and takeoff and num_of_flips < TOTAL_ALLOWED_FLIPS:
+                try:
+                    random_flip = random.choices(flips)
+                    tello.flip(random_flip[0])
+                except Exception as e:
+                    print(e)
+                else:
+                    num_of_flips += 1
+
+            if event == "-front_flip-" and takeoff and num_of_flips < TOTAL_ALLOWED_FLIPS:
+                try:
+                    tello.flip_forward()
+                except Exception as e:
+                    print(e)
+                else:
+                    num_of_flips += 1
+
+            if event == "-back_flip-" and takeoff and num_of_flips < TOTAL_ALLOWED_FLIPS:
+                try:
+                    tello.flip_back()
+                except Exception as e:
+                    print(e)
+                else:
+                    num_of_flips += 1
+
+            if event == "-sharp_left-" and takeoff:
+                try:
+                    tello.rotate_counter_clockwise(SHARP_ROTATE)
+                except Exception as e:
+                    print(e)
+
+            if event == "-sharp_right-" and takeoff:
+                try:
+                    tello.rotate_clockwise(SHARP_ROTATE)
+                except Exception as e:
+                    print(e)
+
+            if event == "-slight_right-" and takeoff:
+                try:
+                    tello.rotate_clockwise(SLIGHT_ROTATE)
+                except Exception as e:
+                    print(e)
+
+            if event == "-slight_left-" and takeoff:
+                try:
+                    tello.rotate_counter_clockwise(SLIGHT_ROTATE)
+                except Exception as e:
+                    print(e)
+
+            if num_of_flips == TOTAL_ALLOWED_FLIPS:
+                window["-problem-bar-"].update(value="You have reached the maximum allowed flips.")
         else:
-            window["-image-"].update(data=image_to_base64("drone.png"), subsample=2)
-
-        if event == "-video-data-" and recording:
-            window['-image-'].update(data=values["-video-data-"], subsample=2)
-
-        if not takeoff and event == "-takeoff-":
-            takeoff = True
-            window["-takeoff-"].update(image_data=image_to_base64("land.png"))
-            tello.takeoff()
-
-        elif takeoff and event == "-takeoff-":
-            takeoff = False
-            window["-takeoff-"].update(image_data=image_to_base64("takeoff.png"))
-            tello.land()
-
-        if event == "-danger-" and takeoff:
-            takeoff = False
-            window["-takeoff-"].update(image_data=image_to_base64("takeoff.png"))
-            tello.emergency()
-
-        if event == "-forward-" and takeoff:
-            tello.move_forward(STEP_SIZE)
-
-        if event == "-backward-" and takeoff:
-            tello.move_back(STEP_SIZE)
-
-        if event == "-left-" and takeoff:
-            tello.move_left(STEP_SIZE)
-
-        if event == "-right-" and takeoff:
-            tello.move_right(STEP_SIZE)
-
-        if event == "-flip-" and takeoff and num_of_flips < TOTAL_ALLOWED_FLIPS:
-            num_of_flips += 1
-            random_flip = random.choices(flips)
-            tello.flip(random_flip[0])
-
-        if event == "-front_flip-" and takeoff and num_of_flips < TOTAL_ALLOWED_FLIPS:
-            num_of_flips += 1
-            tello.flip_forward()
-
-        if event == "-back_flip-" and takeoff and num_of_flips < TOTAL_ALLOWED_FLIPS:
-            num_of_flips += 1
-            tello.flip_back()
-
-        if event == "-sharp_left-" and takeoff:
-            tello.rotate_counter_clockwise(SHARP_ROTATE)
-
-        if event == "-sharp_right-" and takeoff:
-            tello.rotate_clockwise(SHARP_ROTATE)
-
-        if event == "-slight_right-" and takeoff:
-            tello.rotate_clockwise(SLIGHT_ROTATE)
-
-        if event == "-slight_left-" and takeoff:
-            tello.rotate_counter_clockwise(SLIGHT_ROTATE)
+            window["-problem-bar-"].update(value="Unable to establish connection")
+            # print("Unable to establish connection")
 
 
 if __name__ == '__main__':
