@@ -6,10 +6,6 @@ import cv2
 import random
 import threading
 
-"""Things need to be included in
-exception handling for tello commands.
-Multithreading for the tello commands"""
-
 BAR_MAX = 100
 TOTAL_ALLOWED_FLIPS = 2
 SHARP_ROTATE = 90
@@ -79,7 +75,8 @@ def main():
     on_off = [[sg.Button(image_data=image_to_base64("takeoff.png"), key="-takeoff-", tooltip="Takeoff")],
               [sg.Button(image_data=image_to_base64("danger.png"), key="-danger-", tooltip="Emergency stop")]]
 
-    problem_bar = [[sg.Push(), sg.Text(text="", text_color="red", key="-problem-bar-"), sg.Push()]]
+    problem_bar = [[sg.Text("---"*150)],
+                   [sg.Push(), sg.Text(text="", text_color="red", key="-problem-bar-"), sg.Push()]]
 
     layout = [status_bar, video, [sg.Column(movement_lrfb), sg.VerticalSeparator(), sg.Column(movement_flip),
                                   sg.VerticalSeparator(), sg.Column(turn),
@@ -248,6 +245,7 @@ def main():
             if num_of_flips == TOTAL_ALLOWED_FLIPS:
                 window["-problem-bar-"].update(value="You have reached the maximum allowed flips.")
         else:
+            window["-conStatus-"].update(value="Not connected")
             window["-problem-bar-"].update(value="Unable to establish connection")
             # print("Unable to establish connection")
 
