@@ -97,7 +97,7 @@ def main():
                        progress_bar_color=("green", "white"))
 
     while True:
-        event, values = window.read(timeout=0)
+        event, values = window.read()
         if event == "Exit" or event == sg.WIN_CLOSED:
             if takeoff:
                 try:
