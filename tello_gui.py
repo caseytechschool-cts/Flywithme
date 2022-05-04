@@ -59,30 +59,36 @@ def main():
         run_tello = True
 
     status_bar = [sg.Text(text="Connected", size=(50, 1), justification="left", key="-conStatus-"),
-           sg.Push(), sg.ProgressBar(BAR_MAX, orientation='h', key="-batStatus-", style='alt', size=(10, 5), border_width=3)]
+                  sg.Push(), sg.ProgressBar(BAR_MAX, orientation='h', key="-batStatus-", style='alt', size=(10, 5),
+                                            border_width=3)]
 
     video = [[sg.Push(), sg.Image(source=image_to_base64("drone.png"), key="-image-", subsample=2),
-             sg.Push(), sg.Button(image_data=image_to_base64("camera_on.png"), key="-camera-", tooltip="Camera on", pad=65)],
-             [sg.Text("---"*150)]]
+              sg.Push(),
+              sg.Button(image_data=image_to_base64("camera_on.png"), key="-camera-", tooltip="Camera on", pad=65)],
+             [sg.Text("---" * 150)]]
 
-    movement_lrfb = [[sg.Push(), sg.Button(image_data=image_to_base64("up.png"), key="-forward-", tooltip="Move forward"), sg.Push()],
-                     [sg.Button(image_data=image_to_base64("left.png"), key="-left-", tooltip="Move left"), sg.Push(),
-                     sg.Button(image_data=image_to_base64("right.png"), key="-right-", tooltip="Move right")],
-                     [sg.Push(), sg.Button(image_data=image_to_base64("down.png"), key="-backward-", tooltip="Move backward"), sg.Push()]]
+    movement_lrfb = [
+        [sg.Push(), sg.Button(image_data=image_to_base64("up.png"), key="-forward-", tooltip="Move forward"),
+         sg.Push()],
+        [sg.Button(image_data=image_to_base64("left.png"), key="-left-", tooltip="Move left"), sg.Push(),
+         sg.Button(image_data=image_to_base64("right.png"), key="-right-", tooltip="Move right")],
+        [sg.Push(), sg.Button(image_data=image_to_base64("down.png"), key="-backward-", tooltip="Move backward"),
+         sg.Push()]]
 
     movement_flip = [[sg.Button(image_data=image_to_base64("flip.png"), key="-flip-", tooltip="Random flip"),
-                     sg.Button(image_data=image_to_base64("front_flip.png"), key="-front_flip-", tooltip="Front flip"),
-                     sg.Button(image_data=image_to_base64("back_flip.png"), key="-back_flip-", tooltip="Back flip")]]
+                      sg.Button(image_data=image_to_base64("front_flip.png"), key="-front_flip-", tooltip="Front flip"),
+                      sg.Button(image_data=image_to_base64("back_flip.png"), key="-back_flip-", tooltip="Back flip")]]
 
     turn = [[sg.Button(image_data=image_to_base64("turn_sharp_left.png"), key="-sharp_left-", tooltip="Sharp left"),
-            sg.Button(image_data=image_to_base64("turn_sharp_right.png"), key="-sharp_right-", tooltip="Sharp right"),
-            sg.Button(image_data=image_to_base64("turn_slight_left.png"), key="-slight_left-", tooltip="Slight left"),
-            sg.Button(image_data=image_to_base64("turn_slight_right.png"), key="-slight_right-", tooltip="Slight right")]]
+             sg.Button(image_data=image_to_base64("turn_sharp_right.png"), key="-sharp_right-", tooltip="Sharp right"),
+             sg.Button(image_data=image_to_base64("turn_slight_left.png"), key="-slight_left-", tooltip="Slight left"),
+             sg.Button(image_data=image_to_base64("turn_slight_right.png"), key="-slight_right-",
+                       tooltip="Slight right")]]
 
     on_off = [[sg.Button(image_data=image_to_base64("takeoff.png"), key="-takeoff-", tooltip="Takeoff")],
               [sg.Button(image_data=image_to_base64("danger.png"), key="-danger-", tooltip="Emergency stop")]]
 
-    problem_bar = [[sg.Text("---"*150)],
+    problem_bar = [[sg.Text("---" * 150)],
                    [sg.Push(), sg.Text(text="", text_color="red", key="-problem-bar-"), sg.Push()]]
 
     layout = [status_bar, video, [sg.Column(movement_lrfb), sg.VerticalSeparator(), sg.Column(movement_flip),
