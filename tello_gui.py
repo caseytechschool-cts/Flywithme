@@ -36,11 +36,18 @@ def image_to_base64(name):
 
 def video_feed(frame_read, window):
     window.write_event_value("-video-data-", cv2.imencode('.png', frame_read.frame)[1].tobytes())
+    time.sleep(1/30)
 
 
 def drone_movement(tello, left_right, forward_backward, up_down, yaw):
     tello.send_rc_control(left_right, forward_backward, up_down, yaw)
-    # time.sleep(1)
+    time.sleep(1/50)
+
+
+def battery_level(tello):
+    battery = tello.get_battery()
+    time.sleep(1/50)
+    return battery
 
 
 def main():
@@ -116,12 +123,19 @@ def main():
                     tello.end()
                 except Exception as e:
                     print(e)
+            else:
+                if recording:
+                    try:
+                        tello.streamoff()
+                    except Exception as e:
+                        print(e)
+                tello.end()
             return
 
         if run_tello:
             # update the battery progress bar
             try:
-                battery = tello.get_battery()
+                battery = threading.Thread(target=battery_level, args=(tello, ), daemon=True).start()
             except Exception as e:
                 print(e)
             else:
@@ -157,7 +171,7 @@ def main():
 
             if not takeoff and event == "-takeoff-":
                 try:
-                    drone_movement(tello, 0, 0, 0, 0)
+                    threading.Thread(target=drone_movement, args=(tello, 0, 0, 0, 0), daemon=True).start()
                     tello.takeoff()
                 except Exception as e:
                     print(e)
@@ -185,33 +199,25 @@ def main():
 
             if event == "-forward-" and takeoff:
                 try:
-                    # tello.move_forward(STEP_SIZE)
                     threading.Thread(target=drone_movement, args=(tello, 0, VELOCITY, 0, 0), daemon=True).start()
-                    # drone_movement(tello, 0, VELOCITY, 0, 0)
-
                 except Exception as e:
                     print(e)
 
             if event == "-backward-" and takeoff:
                 try:
                     threading.Thread(target=drone_movement, args=(tello, 0, -VELOCITY, 0, 0), daemon=True).start()
-                    # tello.move_back(STEP_SIZE)
-
                 except Exception as e:
                     print(e)
 
             if event == "-left-" and takeoff:
                 try:
                     threading.Thread(target=drone_movement, args=(tello, -VELOCITY, 0, 0, 0), daemon=True).start()
-                    # tello.move_left(STEP_SIZE)
-
                 except Exception as e:
                     print(e)
 
             if event == "-right-" and takeoff:
                 try:
                     threading.Thread(target=drone_movement, args=(tello, VELOCITY, 0, 0, 0), daemon=True).start()
-                    # tello.move_right(STEP_SIZE)
                 except Exception as e:
                     print(e)
 
@@ -243,37 +249,32 @@ def main():
             if event == "-sharp_left-" and takeoff:
                 try:
                     threading.Thread(target=drone_movement, args=(tello, 0, 0, 0, -SHARP_ROTATE), daemon=True).start()
-                    # tello.rotate_counter_clockwise(SHARP_ROTATE)
                 except Exception as e:
                     print(e)
 
             if event == "-sharp_right-" and takeoff:
                 try:
                     threading.Thread(target=drone_movement, args=(tello, 0, 0, 0, SHARP_ROTATE), daemon=True).start()
-                    # tello.rotate_clockwise(SHARP_ROTATE)
                 except Exception as e:
                     print(e)
 
             if event == "-slight_right-" and takeoff:
                 try:
                     threading.Thread(target=drone_movement, args=(tello, 0, 0, 0, SLIGHT_ROTATE), daemon=True).start()
-                    # tello.rotate_clockwise(SLIGHT_ROTATE)
                 except Exception as e:
                     print(e)
 
             if event == "-slight_left-" and takeoff:
                 try:
                     threading.Thread(target=drone_movement, args=(tello, 0, 0, 0, -SLIGHT_ROTATE), daemon=True).start()
-                    # tello.rotate_counter_clockwise(SLIGHT_ROTATE)
                 except Exception as e:
                     print(e)
 
-            if num_of_flips == TOTAL_ALLOWED_FLIPS or battery < LOW_BATTERY_LEVEL:
+            if num_of_flips >= TOTAL_ALLOWED_FLIPS or battery <= LOW_BATTERY_LEVEL:
                 window["-problem-bar-"].update(value="You have reached the maximum allowed flips or battery is low.")
         else:
             window["-conStatus-"].update(value="Not connected")
             window["-problem-bar-"].update(value="Unable to establish connection")
-            # print("Unable to establish connection")
 
 
 if __name__ == '__main__':
