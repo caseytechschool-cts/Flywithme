@@ -92,12 +92,6 @@ def drone_movement(tello, left_right, forward_backward, up_down, yaw):
     time.sleep(1/50)
 
 
-def battery_level(tello):
-    battery = tello.get_battery()
-    time.sleep(1/50)
-    return battery
-
-
 def main():
     sg.theme("SystemDefault")
     num_of_flips = 0
@@ -183,7 +177,7 @@ def main():
         if run_tello:
             # update the battery progress bar
             try:
-                battery = threading.Thread(target=battery_level, args=(tello, ), daemon=True).start()
+                battery = tello.get_battery()
             except Exception as e:
                 print(e)
             else:
