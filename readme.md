@@ -27,6 +27,6 @@ Here is a screenshot of the user interface.
 
 ## Connection issues
 
-There is a known connection issue. If you run the application and it is not working, please close the 
+There is a known connection issue. If you run the application, and it is not working, please close the 
 application, disconnect from the drone Wi-Fi, reconnect and reopen the application.
 
