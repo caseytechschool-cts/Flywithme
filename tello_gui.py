@@ -156,10 +156,10 @@ def main():
         if event == "Exit" or event == sg.WIN_CLOSED:
             if takeoff:
                 try:
-                    tello.land()
+                    tello.send_command_without_return("land")
                     if recording:
                         try:
-                            tello.streamoff()
+                            tello.send_command_without_return("streamoff")
                         except Exception as e:
                             print(e)
                     tello.end()
@@ -168,7 +168,7 @@ def main():
             else:
                 if recording:
                     try:
-                        tello.streamoff()
+                        tello.send_command_without_return("streamoff")
                     except Exception as e:
                         print(e)
                 tello.end()
@@ -193,7 +193,7 @@ def main():
                 if not recording:
                     window["-camera-"].update(image_data=image_to_base64("camera_off.png"))
                     try:
-                        tello.streamon()
+                        tello.send_command_without_return("streamon")
                     except Exception as e:
                         print(e)
                     else:
@@ -223,7 +223,7 @@ def main():
 
             elif takeoff and event == "-takeoff-":
                 try:
-                    tello.land()
+                    tello.send_command_without_return("land")
                 except Exception as e:
                     print(e)
                 else:
@@ -266,7 +266,8 @@ def main():
             if event == "-flip-" and takeoff and num_of_flips < TOTAL_ALLOWED_FLIPS:
                 try:
                     random_flip = random.choices(flips)
-                    tello.flip(random_flip[0])
+                    # tello.flip(random_flip[0])
+                    tello.send_command_without_return("flip {}".format(random_flip[0]))
                 except Exception as e:
                     print(e)
                 else:
@@ -274,7 +275,8 @@ def main():
 
             if event == "-front_flip-" and takeoff and num_of_flips < TOTAL_ALLOWED_FLIPS:
                 try:
-                    tello.flip_forward()
+                    # tello.flip_forward()
+                    tello.send_command_without_return("flip f")
                 except Exception as e:
                     print(e)
                 else:
@@ -282,7 +284,8 @@ def main():
 
             if event == "-back_flip-" and takeoff and num_of_flips < TOTAL_ALLOWED_FLIPS:
                 try:
-                    tello.flip_back()
+                    # tello.flip_back()
+                    tello.send_command_without_return("flip b")
                 except Exception as e:
                     print(e)
                 else:
