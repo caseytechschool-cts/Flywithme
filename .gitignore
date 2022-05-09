@@ -1,5 +1,8 @@
 theme_list.py
 themes.txt
 /.idea
-.\tello_gui.exe
+telloPythonGUI.spec
+/build
+/dist
+
 

@@ -1,3 +1,6 @@
+import os
+import sys
+
 import PySimpleGUI as sg
 import base64
 import os.path as path
@@ -64,6 +67,17 @@ VELOCITY = 20
 LOW_BATTERY_LEVEL = 20
 flips = ["l", "r", "f", "b"]
 
+
+def resource_path(relative_path):
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
 """A simple function for converting the source image into a base64 data for universal use.
 :param name: (str) the name of the image file
 :return: the base64 of the image file
@@ -84,12 +98,12 @@ def image_to_base64(name):
 
 def video_feed(frame_read, window):
     window.write_event_value("-video-data-", cv2.imencode('.png', frame_read.frame)[1].tobytes())
-    time.sleep(1/30)
+    time.sleep(1 / 30)
 
 
 def drone_movement(tello, left_right, forward_backward, up_down, yaw):
     tello.send_rc_control(left_right, forward_backward, up_down, yaw)
-    time.sleep(1/50)
+    time.sleep(1 / 50)
 
 
 def main():
@@ -107,35 +121,35 @@ def main():
     else:
         run_tello = True
 
-    status_bar = [sg.Text(text="Connected", size=(50, 1), justification="left", key="-conStatus-"),
+    status_bar = [sg.Text(text="Not connected", size=(50, 1), justification="left", key="-conStatus-"),
                   sg.Push(), sg.ProgressBar(BAR_MAX, orientation='h', key="-batStatus-", style='alt', size=(10, 5),
                                             border_width=3)]
 
-    video = [[sg.Push(), sg.Image(source=image_to_base64("drone.png"), key="-image-", subsample=2),
+    video = [[sg.Push(), sg.Image(source=image_to_base64(resource_path("images/drone.png")), key="-image-", subsample=2),
               sg.Push(),
-              sg.Button(image_data=image_to_base64("camera_on.png"), key="-camera-", tooltip="Camera on", pad=65)],
+              sg.Button(image_data=image_to_base64(resource_path("images/camera_on.png")), key="-camera-", tooltip="Camera on", pad=65)],
              [sg.Text("---" * 150)]]
 
     movement_lrfb = [
-        [sg.Push(), sg.Button(image_data=image_to_base64("up.png"), key="-forward-", tooltip="Move forward"),
+        [sg.Push(), sg.Button(image_data=image_to_base64(resource_path("images/up.png")), key="-forward-", tooltip="Move forward"),
          sg.Push()],
-        [sg.Button(image_data=image_to_base64("left.png"), key="-left-", tooltip="Move left"), sg.Push(),
-         sg.Button(image_data=image_to_base64("right.png"), key="-right-", tooltip="Move right")],
-        [sg.Push(), sg.Button(image_data=image_to_base64("down.png"), key="-backward-", tooltip="Move backward"),
+        [sg.Button(image_data=image_to_base64(resource_path("images/left.png")), key="-left-", tooltip="Move left"), sg.Push(),
+         sg.Button(image_data=image_to_base64(resource_path("images/right.png")), key="-right-", tooltip="Move right")],
+        [sg.Push(), sg.Button(image_data=image_to_base64(resource_path("images/down.png")), key="-backward-", tooltip="Move backward"),
          sg.Push()]]
 
-    movement_flip = [[sg.Button(image_data=image_to_base64("flip.png"), key="-flip-", tooltip="Random flip"),
-                      sg.Button(image_data=image_to_base64("front_flip.png"), key="-front_flip-", tooltip="Front flip"),
-                      sg.Button(image_data=image_to_base64("back_flip.png"), key="-back_flip-", tooltip="Back flip")]]
+    movement_flip = [[sg.Button(image_data=image_to_base64(resource_path("images/flip.png")), key="-flip-", tooltip="Random flip"),
+                      sg.Button(image_data=image_to_base64(resource_path("images/front_flip.png")), key="-front_flip-", tooltip="Front flip"),
+                      sg.Button(image_data=image_to_base64(resource_path("images/back_flip.png")), key="-back_flip-", tooltip="Back flip")]]
 
-    turn = [[sg.Button(image_data=image_to_base64("turn_sharp_left.png"), key="-sharp_left-", tooltip="Sharp left"),
-             sg.Button(image_data=image_to_base64("turn_sharp_right.png"), key="-sharp_right-", tooltip="Sharp right"),
-             sg.Button(image_data=image_to_base64("turn_slight_left.png"), key="-slight_left-", tooltip="Slight left"),
-             sg.Button(image_data=image_to_base64("turn_slight_right.png"), key="-slight_right-",
+    turn = [[sg.Button(image_data=image_to_base64(resource_path("images/turn_sharp_left.png")), key="-sharp_left-", tooltip="Sharp left"),
+             sg.Button(image_data=image_to_base64(resource_path("images/turn_sharp_right.png")), key="-sharp_right-", tooltip="Sharp right"),
+             sg.Button(image_data=image_to_base64(resource_path("images/turn_slight_left.png")), key="-slight_left-", tooltip="Slight left"),
+             sg.Button(image_data=image_to_base64(resource_path("images/turn_slight_right.png")), key="-slight_right-",
                        tooltip="Slight right")]]
 
-    on_off = [[sg.Button(image_data=image_to_base64("takeoff.png"), key="-takeoff-", tooltip="Takeoff")],
-              [sg.Button(image_data=image_to_base64("danger.png"), key="-danger-", tooltip="Emergency stop")]]
+    on_off = [[sg.Button(image_data=image_to_base64(resource_path("images/takeoff.png")), key="-takeoff-", tooltip="Takeoff")],
+              [sg.Button(image_data=image_to_base64(resource_path("images/danger.png")), key="-danger-", tooltip="Emergency stop")]]
 
     problem_bar = [[sg.Text("---" * 150)],
                    [sg.Push(), sg.Text(text="", text_color="red", key="-problem-bar-"), sg.Push()]]
@@ -148,7 +162,7 @@ def main():
     window = sg.Window(title="  ::Tello Controller by CTS::  ",
                        layout=layout,
                        size=(1200, 800),
-                       icon=image_to_base64("drone_ico.png"),
+                       icon=image_to_base64(resource_path("images/drone_ico.png")),
                        progress_bar_color=("green", "white"))
 
     while True:
@@ -175,6 +189,7 @@ def main():
             return
 
         if run_tello:
+            window["-conStatus-"].update(value="Connected")
             # update the battery progress bar
             try:
                 battery = tello.get_battery()
@@ -191,7 +206,7 @@ def main():
 
             if event == "-camera-":
                 if not recording:
-                    window["-camera-"].update(image_data=image_to_base64("camera_off.png"))
+                    window["-camera-"].update(image_data=image_to_base64(resource_path("images/camera_off.png")))
                     try:
                         tello.send_command_without_return("streamon")
                     except Exception as e:
@@ -201,12 +216,12 @@ def main():
                         recording = True
                 else:
                     recording = False
-                    window["-camera-"].update(image_data=image_to_base64("camera_on.png"))
+                    window["-camera-"].update(image_data=image_to_base64(resource_path("images/camera_on.png")))
 
             if recording:
                 threading.Thread(target=video_feed, args=(frame_read, window), daemon=True).start()
             else:
-                window["-image-"].update(data=image_to_base64("drone.png"), subsample=2)
+                window["-image-"].update(data=image_to_base64(resource_path("images/drone.png")), subsample=2)
 
             if event == "-video-data-" and recording:
                 window['-image-'].update(data=values["-video-data-"], subsample=2)
@@ -219,7 +234,7 @@ def main():
                     print(e)
                 else:
                     takeoff = True
-                    window["-takeoff-"].update(image_data=image_to_base64("land.png"))
+                    window["-takeoff-"].update(image_data=image_to_base64(resource_path("images/land.png")))
 
             elif takeoff and event == "-takeoff-":
                 try:
@@ -228,7 +243,7 @@ def main():
                     print(e)
                 else:
                     takeoff = False
-                    window["-takeoff-"].update(image_data=image_to_base64("takeoff.png"))
+                    window["-takeoff-"].update(image_data=image_to_base64(resource_path("images/takeoff.png")))
 
             if event == "-danger-" and takeoff:
                 try:
@@ -237,7 +252,7 @@ def main():
                     print(e)
                 else:
                     takeoff = False
-                    window["-takeoff-"].update(image_data=image_to_base64("takeoff.png"))
+                    window["-takeoff-"].update(image_data=image_to_base64(resource_path("images/takeoff.png")))
 
             if event == "-forward-" and takeoff:
                 try:
