@@ -173,7 +173,7 @@ def main():
                     tello.send_command_without_return("land")
                     if recording:
                         try:
-                            tello.send_command_without_return("streamoff")
+                            tello.streamoff()
                         except Exception as e:
                             print(e)
                     tello.end()
@@ -182,7 +182,7 @@ def main():
             else:
                 if recording:
                     try:
-                        tello.send_command_without_return("streamoff")
+                        tello.streamoff()
                     except Exception as e:
                         print(e)
                 tello.end()
@@ -208,7 +208,7 @@ def main():
                 if not recording:
                     window["-camera-"].update(image_data=image_to_base64(resource_path("images/camera_off.png")))
                     try:
-                        tello.send_command_without_return("streamon")
+                        tello.streamon()
                     except Exception as e:
                         print(e)
                     else:
