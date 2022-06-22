@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/TelloPythonGUI.iml" filepath="$PROJECT_DIR$/.idea/TelloPythonGUI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Flywithme.iml" filepath="$PROJECT_DIR$/.idea/Flywithme.iml" />
     </modules>
   </component>
 </project>
