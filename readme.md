@@ -1,3 +1,5 @@
+[![GitHub issues](https://img.shields.io/github/issues/caseytechschool-cts/Flywithme)](https://github.com/caseytechschool-cts/Flywithme/issues)
+
 # Tello drone controller
 
 **Pre-release is available now. Checkout the `Releases` section to download the EXE file**
