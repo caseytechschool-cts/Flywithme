@@ -17,10 +17,6 @@ to easily navigate a Tello Edu drone.
 Before running the application, turn on your Tello Edu drone and connect your computer
 with the Tello drone's Wi-Fi SSD.
 
-Here is a screenshot of the user interface.
-
-![drone screen-shot](images/drone-screenshot.png)
-
 ## Basic operations
 
 ![drone basic operations](images/basic-operations.png)
