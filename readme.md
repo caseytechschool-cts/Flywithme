@@ -1,4 +1,4 @@
-[![GitHub issues](https://img.shields.io/github/issues/caseytechschool-cts/Flywithme)](https://github.com/caseytechschool-cts/Flywithme/issues)
+[![GitHub issues](https://img.shields.io/github/issues/caseytechschool-cts/Flywithme)](https://github.com/caseytechschool-cts/Flywithme/issues) [![GitHub stars](https://img.shields.io/github/stars/caseytechschool-cts/Flywithme)](https://github.com/caseytechschool-cts/Flywithme/stargazers) [![GitHub license](https://img.shields.io/github/license/caseytechschool-cts/Flywithme)](https://github.com/caseytechschool-cts/Flywithme/blob/main/LICENSE) [![GitHub forks](https://img.shields.io/github/forks/caseytechschool-cts/Flywithme)](https://github.com/caseytechschool-cts/Flywithme/network) 
 
 # Tello drone controller
 
