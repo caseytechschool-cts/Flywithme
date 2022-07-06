@@ -2,12 +2,12 @@
 
 # Tello drone controller
 
-**Pre-release is available now. Checkout the `Releases` section to download the EXE file**
+**Pre-release is available now. Click on the `Download Link` button to download the EXE file**
 
 :fire::fire::fire::fire::fire::fire::fire::fire:
 
 ## Download link
-[![GitHub issues](https://img.shields.io/badge/Download-Link-brightgreen)](https://github.com/caseytechschool-cts/Flywithme/releases/download/v1.0.0.0-rc/FlywithME.exe)
+[![Download link](https://img.shields.io/badge/Download-Link-brightgreen)](https://github.com/caseytechschool-cts/Flywithme/releases/download/v1.0.0.0-rc/FlywithME.exe)
 
 
 A Python GUI project by Casey Tech School to control a Tello Edu drone. Ships with a slick user interface and build-in controller 
