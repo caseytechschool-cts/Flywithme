@@ -1,6 +1,7 @@
 [![GitHub issues](https://img.shields.io/github/issues/caseytechschool-cts/Flywithme)](https://github.com/caseytechschool-cts/Flywithme/issues) [![GitHub stars](https://img.shields.io/github/stars/caseytechschool-cts/Flywithme)](https://github.com/caseytechschool-cts/Flywithme/stargazers) [![GitHub license](https://img.shields.io/github/license/caseytechschool-cts/Flywithme)](https://github.com/caseytechschool-cts/Flywithme/blob/main/LICENSE) [![GitHub forks](https://img.shields.io/github/forks/caseytechschool-cts/Flywithme)](https://github.com/caseytechschool-cts/Flywithme/network) 
 
-# Tello drone controller
+![promo](images/promo.png)
+# Flywithme
 
 **Pre-release is available now. Click on the `Download Link` button to download the EXE file**
 
@@ -10,11 +11,19 @@
 [![Download link](https://img.shields.io/badge/Download-Link-brightgreen)](https://github.com/caseytechschool-cts/Flywithme/releases/download/v1.0.0.0-rc/FlywithME.exe)
 
 
-A Python GUI project by Casey Tech School to control a Tello Edu drone. Ships with a slick user interface and build-in controller 
-to easily navigate a Tello Edu drone.
+Flywithme is more than just a drone controller - it's a gateway to the sky. With its sleek and intuitive user interface, Flywithme allows you to take control of your drone and soar to new heights. Whether you're a seasoned drone pilot or a beginner looking to take to the skies for the first time, Flywithme has everything you need to fly with confidence.
 
-Before running the application, turn on your Tello Edu drone and connect your computer
-with the Tello drone's Wi-Fi SSD.
+Flywithme will greet you with a dynamic battery life indicator and a live video feed from the drone's camera, giving you a front view of the world. With the ability to manoeuvre your drone in any direction with ease, you'll feel like you're flying alongside it as it soars through the air.
+
+But Flywithme isn't just about getting from point A to point B - it's about pushing the boundaries of what's possible with your drone. With just a touch of a button, you can perform aerial tricks and manoeuvres that will leave your friends and family in awe. Whether you're executing flips and turns or taking on daring 30-degree angles, Flywithme puts the power of flight at your fingertips.
+
+But safety is always a top priority, and that's why Flywithme includes an emergency stop button that will immediately bring your drone back to the ground if necessary. And when it's time to land, Flywithme makes it a breeze with a dedicated button that ensures a smooth and controlled descent.
+
+In short, Flywithme is the ultimate drone controller - a tool that allows you to take your drone to new heights and explore the world from above. So, whether you're looking to capture stunning aerial footage or simply experience the thrill of flight, Flywithme is the software you need to make it happen.
+
+## How to operate
+Turn on your Tello Edu drone and connect your computer with the Tello drone's Wi-Fi SSD. Once connected
+run Flywithme.
 
 ## Basic operations
 
